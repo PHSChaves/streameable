@@ -46,7 +46,8 @@ const liveViewerRoute = createRoute({
   beforeLoad: async ({ params }) => {
     let broadcasterName: string | null = null
     try {
-      const res = await fetch('http://localhost:8080/api/broadcaster')
+      const base = (import.meta.env.VITE_SIGNAL_HTTP as string | undefined) ?? 'http://localhost:8080'
+      const res = await fetch(`${base}/api/broadcaster`)
       const data = await res.json()
       broadcasterName = data.name ?? null
     } catch {
