@@ -25,13 +25,11 @@ export function LiveBroadcasting() {
   const elapsed = useLiveTimer(status === 'live')
   const isLive = status === 'live'
 
-  // Sync URL login → nameAtom so Layout shows it
   useEffect(() => { setName(login) }, [login, setName])
 
-  // Auto-start when entering the page
   useEffect(() => {
     startStream()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   function handleEnd() {
     stopStream()
@@ -39,10 +37,8 @@ export function LiveBroadcasting() {
   }
 
   return (
-    // Full screen on mobile, centered card on desktop
     <div className="flex-1 flex flex-col relative bg-black lg:items-center lg:justify-center lg:p-8">
 
-      {/* ── Video (fills screen on mobile) ──────────────────────────── */}
       <div className="relative flex-1 lg:flex-none lg:w-full lg:max-w-4xl lg:aspect-video lg:rounded-2xl overflow-hidden bg-zinc-900">
 
         <video
@@ -53,7 +49,6 @@ export function LiveBroadcasting() {
           className={`absolute inset-0 w-full h-full object-cover ${camOff ? 'hidden' : 'block'}`}
         />
 
-        {/* Camera off overlay */}
         {camOff && (
           <div className="absolute inset-0 flex items-center justify-center bg-zinc-900">
             <div className="text-center">
@@ -65,14 +60,12 @@ export function LiveBroadcasting() {
           </div>
         )}
 
-        {/* Pre-start overlay */}
         {status === 'requesting' && (
           <div className="absolute inset-0 flex items-center justify-center bg-zinc-900">
             <p className="text-zinc-400 text-sm animate-pulse">Starting camera…</p>
           </div>
         )}
 
-        {/* Error overlay */}
         {status === 'error' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-zinc-900 px-6 text-center">
             <span className="text-4xl">⚠️</span>
@@ -83,7 +76,6 @@ export function LiveBroadcasting() {
           </div>
         )}
 
-        {/* ── TOP bar overlay ─────────────────────────────────────────── */}
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/60 to-transparent">
           {isLive ? (
             <div className="flex items-center gap-2">
@@ -103,7 +95,6 @@ export function LiveBroadcasting() {
           )}
         </div>
 
-        {/* ── BOTTOM controls overlay ──────────────────────────────────── */}
         <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-4 bg-gradient-to-t from-black/70 to-transparent">
           <div className="flex items-center gap-2">
             <button
@@ -136,7 +127,6 @@ export function LiveBroadcasting() {
         </div>
       </div>
 
-      {/* ── Desktop-only chat panel ──────────────────────────────────── */}
       <div className="hidden lg:flex lg:w-full lg:max-w-4xl mt-4 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex-col h-52">
         <h2 className="text-sm font-semibold text-zinc-400 mb-3">Live Chat</h2>
         <div className="flex-1 flex items-center justify-center">
