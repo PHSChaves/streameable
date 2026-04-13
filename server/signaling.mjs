@@ -128,6 +128,7 @@ wss.on('connection', (ws) => {
   })
 })
 
-server.listen(8080, () => {
-  console.log('Signaling server listening on http/ws://localhost:8080')
+const PORT = process.env.PORT ?? 8080
+server.listen(PORT, () => {
+  console.log(`Signaling server listening on http/ws://localhost:${PORT}`)
 })
