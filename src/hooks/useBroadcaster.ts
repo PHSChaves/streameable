@@ -16,6 +16,8 @@ export function useBroadcaster(login: string) {
   const [viewerCount, setViewerCount] = useState(0)
   const [muted, setMuted] = useState(false)
   const [camOff, setCamOff] = useState(false)
+  // 'user' = câmera frontal, 'environment' = câmera traseira
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
 
   const streamRef = useRef<MediaStream | null>(null)
   const wsRef = useRef<WebSocket | null>(null)
@@ -211,7 +213,40 @@ export function useBroadcaster(login: string) {
     setCamOff(!track.enabled)
   }, [])
 
+  const switchCamera = useCallback(async () => {
+    if (!streamRef.current) return
+
+    const newFacing: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
+
+    let newStream: MediaStream
+    try {
+      newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: newFacing },
+        audio: false,
+      })
+    } catch {
+      return // device doesn't have that camera
+    }
+
+    const newVideoTrack = newStream.getVideoTracks()[0]
+
+    // Swap the video track in every active peer connection without renegotiating
+    peersRef.current.forEach((pc) => {
+      const sender = pc.getSenders().find((s) => s.track?.kind === 'video')
+      if (sender) sender.replaceTrack(newVideoTrack)
+    })
+
+    // Stop the old video track and replace it in the stream
+    streamRef.current.getVideoTracks().forEach((t) => t.stop())
+    streamRef.current.getVideoTracks().forEach((t) => streamRef.current!.removeTrack(t))
+    streamRef.current.addTrack(newVideoTrack)
+
+    if (videoRef.current) videoRef.current.srcObject = streamRef.current
+
+    setFacingMode(newFacing)
+  }, [facingMode])
+
   useEffect(() => () => stopStream(), [stopStream])
 
-  return { videoRef, status, error, viewerCount, muted, camOff, startStream, stopStream, toggleMute, toggleCam }
+  return { videoRef, status, error, viewerCount, muted, camOff, facingMode, startStream, stopStream, toggleMute, toggleCam, switchCamera }
 }

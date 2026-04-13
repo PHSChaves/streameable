@@ -21,7 +21,7 @@ export function LiveBroadcasting() {
   const { login } = useParams({ strict: false }) as { login: string }
   const [, setName] = useAtom(nameAtom)
   const navigate = useNavigate()
-  const { videoRef, status, error, viewerCount, muted, camOff, startStream, stopStream, toggleMute, toggleCam } = useBroadcaster(login)
+  const { videoRef, status, error, viewerCount, muted, camOff, facingMode, startStream, stopStream, toggleMute, toggleCam, switchCamera } = useBroadcaster(login)
   const elapsed = useLiveTimer(status === 'live')
   const isLive = status === 'live'
 
@@ -115,6 +115,15 @@ export function LiveBroadcasting() {
               }`}
             >
               {camOff ? '📵' : '📹'}
+            </button>
+
+            <button
+              onClick={switchCamera}
+              disabled={!isLive || camOff}
+              title={facingMode === 'user' ? 'Switch to rear camera' : 'Switch to front camera'}
+              className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center text-lg transition-colors disabled:opacity-30"
+            >
+              🔄
             </button>
           </div>
 
